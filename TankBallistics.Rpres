@@ -1,0 +1,93 @@
+Tank Ballistics App (Projectile Motion)
+========================================================
+author: Andrew Chastain
+date: 6/17/2019
+autosize: true
+
+Teaching Projectile Motion
+========================================================
+
+Using R with Shiny it is possible to build quick, interactive applications to help teach math and physics concepts. This presentation will discuss the features of my "Tank Ballistics" application and discuss how it can be used to experiment with the parameters that impact simple (zero drag) projectile motion.
+
+<http://andrewchastain.shinyapps.io/Tank_ballistics/>
+
+Projectile Motion
+========================================================
+
+In this system, we know the parameters of projectile velocity ($V$ $(m/s)$), angle of attack ($\theta$ $(degrees)$) and strength of gravity ($g$ $(m/s^2)$). The projectile velocity can then be broken down into the x and y components as:  
+
+$V_{x} = V * cos(\theta * (2 \pi/360))$  
+$V_{y} = V * sin(\theta * (2 \pi/360))$  
+
+This can then be used to write equations of motion in the x (horizontal) and y (vertical) directions. The equations of motion are functions of time, $t$.
+
+$x(t) = V_{x} * t$  
+$y(t) = V_{y} * t - 1/2 * g * t^2$  
+
+Changing the angle
+========================================================
+
+```{r plot_angle, echo = FALSE}
+t1 <- 2/9.8 * 100 * sin(30/360 * 2 * pi)
+t2 <- 2/9.8 * 100 * sin(45/360 * 2 * pi)
+t3 <- 2/9.8 * 100 * sin(60/360 * 2 * pi)
+
+seq1 <- seq(from = 0, to = t1, by = 0.5)
+seq2 <- seq(from = 0, to = t2, by = 0.5)
+seq3 <- seq(from = 0, to = t3, by = 0.5)
+
+x1 <- 100 * cos(30/360 * 2 * pi) * seq1
+y1 <- 100 * sin(30/360 * 2 * pi) * seq1 - 9.8 / 2 * seq1^2
+x2 <- 100 * cos(45/360 * 2 * pi) * seq2
+y2 <- 100 * sin(45/360 * 2 * pi) * seq2 - 9.8 / 2 * seq2^2
+x3 <- 100 * cos(60/360 * 2 * pi) * seq3
+y3 <- 100 * sin(60/360 * 2 * pi) * seq3 - 9.8 / 2 * seq3^2
+
+x_max <- ceiling(max(c(x1, x2, x3)))
+y_max <- ceiling(max(c(y1, y2, y3)))
+
+plot(x = c(0, x_max),
+     y = c(0, y_max),
+     type = "n",
+     asp = 1,
+     main = "Changing Angle of Attack",
+     xlab = "Distance to target (m)",
+     ylab = "Height (m)")
+abline(h = 0)
+lines(x = x1, y = y1, col = "green")
+lines(x = x2, y = y2, col = "red")
+lines(x = x3, y = y3, col = "blue")
+legend("topright",
+       legend = c("30 degree", "45 degree", "60 degree"),
+       col = c("green", "red", "blue"),
+       lty = 1)
+```  
+
+Tank Ballistics App
+========================================================
+The app allows users to select values for strength of gravity, angle of attack (in degrees), projectile Speed, and an approximate distance to target. The target distance has a random jitter added to make things more interesting. By adjusting angle of attack and projectile speed (and/or gravity) the user is able to adjust the trajectory to try to land within 10m of the target.  
+
+```{r example, fig.dim = c(8, 4), echo = FALSE}
+t4 <- 2/9.8 * 75 * sin(38/360 * 2 * pi)
+
+seq4 <- seq(from = 0, to = t4, by = 0.01)
+
+x4 <- 75 * cos(38/360 * 2 * pi) * seq4
+y4 <- 75 * sin(38/360 * 2 * pi) * seq4 - 9.8 / 2 * seq4^2
+
+x_max <- ceiling(max(x4))
+y_max <- ceiling(max(y4))
+
+plot(x = c(0, x_max),
+     y = c(0, y_max),
+     type = "n",
+     asp = 1,
+     main = "Changing Angle of Attack",
+     xlab = "Distance to target (m)",
+     ylab = "Height (m)")
+abline(h = 0)
+points(x = 0, y = 0, pch = 16, col = "red", cex = 2)
+points(x = x_max + 4, y = 0, pch = 16, col = "orange", cex = 2)
+lines(x = x4, y = y4, col = "green")
+points(x = max(x4), y = 0, pch = 21, col = "red", cex = 9)
+```
